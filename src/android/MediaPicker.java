@@ -54,8 +54,7 @@ public class MediaPicker extends CordovaPlugin {
                     showLoader = opts.optBoolean("showLoader", true);
                     imageOnly = opts.optBoolean("imageOnly", false);
                     mediaType = opts.optString("mediaType", null);
-
-                    // rétro-compatibilité
+                    // compatibility fallback for older versions
                     if (mediaType == null || mediaType.isEmpty()) {
                         mediaType = imageOnly ? "images" : "all";
                     }     

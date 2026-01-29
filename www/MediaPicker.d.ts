@@ -45,6 +45,8 @@ export interface MediaPickerOptions {
   showLoader?: boolean;
   /** Whether to allow only image selection (default false) */
   imageOnly?: boolean;
+  /** Type of media to pick (default 'all') */
+  mediaType?: 'all' | 'images' | 'videos';
 }
 
 interface CordovaPlugins {

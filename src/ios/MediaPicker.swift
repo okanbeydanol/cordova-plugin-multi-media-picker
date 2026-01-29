@@ -27,7 +27,7 @@ class MediaPicker: CDVPlugin, PHPickerViewControllerDelegate {
             if let imageOnly = opts["imageOnly"] as? Bool { imageOnlyOpt = imageOnly }
             if let mediaType = opts["mediaType"] as? String { mediaTypeOpt = mediaType }
             else {
-                // si mediatype n'est pas défini par l'utilisateur, prendre en compte la valeur de imageOnly
+                // compatibility fallback for older versions
                 mediaTypeOpt = imageOnlyOpt ? "images" : "all";
             }
         }
@@ -47,12 +47,6 @@ class MediaPicker: CDVPlugin, PHPickerViewControllerDelegate {
 
         if #available(iOS 14, *) {
             var config = PHPickerConfiguration()
-            // if imageOnlyOpt {
-            //     config.filter = .images
-            // } else {
-            //     config.filter = .any(of: [.images, .videos])
-            // }
-
             switch mediaTypeOpt {
             case "images": config.filter = .images
             break;
