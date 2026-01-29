@@ -12,6 +12,7 @@ class MediaPicker: CDVPlugin, PHPickerViewControllerDelegate {
     private var selectionLimitOpt: Int = 3
     private var showLoaderOpt: Bool = true
     private var imageOnlyOpt: Bool = false
+    private var mediaTypeOpt : String = "all" // ✅ Ajouté
 
     private weak var overlayView: UIView?
     private weak var overlaySpinner: UIActivityIndicatorView?
@@ -24,6 +25,11 @@ class MediaPicker: CDVPlugin, PHPickerViewControllerDelegate {
             if let limit = opts["selectionLimit"] as? Int { selectionLimitOpt = max(1, limit) }
             if let show = opts["showLoader"] as? Bool { showLoaderOpt = show }
             if let imageOnly = opts["imageOnly"] as? Bool { imageOnlyOpt = imageOnly }
+            if let mediaType = opts["mediaType"] as? String { mediaTypeOpt = mediaType }
+            else {
+                // si mediatype n'est pas défini par l'utilisateur, prendre en compte la valeur de imageOnly
+                mediaTypeOpt = imageOnlyOpt ? "images" : "all";
+            }
         }
 
         guard let presentingVC = self.viewController else {
@@ -41,11 +47,23 @@ class MediaPicker: CDVPlugin, PHPickerViewControllerDelegate {
 
         if #available(iOS 14, *) {
             var config = PHPickerConfiguration()
-            if imageOnlyOpt {
-                config.filter = .images
-            } else {
-                config.filter = .any(of: [.images, .videos])
-            }
+            // if imageOnlyOpt {
+            //     config.filter = .images
+            // } else {
+            //     config.filter = .any(of: [.images, .videos])
+            // }
+
+            switch mediaTypeOpt {
+            case "images": config.filter = .images
+            break;
+
+            case "videos" : config.filter = .videos
+            break;
+
+            default:  config.filter = .any(of: [.images, .videos])
+                
+            } 
+
             config.selectionLimit = selectionLimitOpt
 
             let picker = PHPickerViewController(configuration: config)

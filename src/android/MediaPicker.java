@@ -32,6 +32,7 @@ public class MediaPicker extends CordovaPlugin {
     private int selectionLimit = 3;
     private boolean showLoader = true;
     private boolean imageOnly = false;
+    private String mediaType = "all"; // images | videos | all
 
     private FrameLayout overlayView;
     private ProgressBar overlaySpinner;
@@ -52,6 +53,12 @@ public class MediaPicker extends CordovaPlugin {
                     selectionLimit = Math.max(1, opts.optInt("selectionLimit", 3));
                     showLoader = opts.optBoolean("showLoader", true);
                     imageOnly = opts.optBoolean("imageOnly", false);
+                    mediaType = opts.optString("mediaType", null);
+
+                    // rétro-compatibilité
+                    if (mediaType == null || mediaType.isEmpty()) {
+                        mediaType = imageOnly ? "images" : "all";
+                    }     
                 }
             }
 
@@ -65,23 +72,44 @@ public class MediaPicker extends CordovaPlugin {
                     intent.putExtra(MediaStore.EXTRA_PICK_IMAGES_MAX, selectionLimit);
                 }
 
-                if (imageOnly) {
-                    intent.setType("image/*");
-                } else {
-                    intent.setType("*/*");
-                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*"});
+                switch (mediaType) {
+                    case "images":
+                        intent.setType("image/*");
+                        break;
+
+                    case "videos":
+                        intent.setType("video/*");
+                        break;
+
+                    case "all":
+                    default:
+                        intent.setType("*/*");
+                        intent.putExtra(Intent.EXTRA_MIME_TYPES,
+                            new String[]{"image/*", "video/*"});
+                        break;
                 }
+
 
             } else {
                 // ✅ Fallback for Android 10 and below
                 intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
 
-                if (imageOnly) {
-                    intent.setType("image/*");
-                } else {
-                    intent.setType("*/*");
-                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*"});
+               switch (mediaType) {
+                    case "images":
+                        intent.setType("image/*");
+                        break;
+
+                    case "videos":
+                        intent.setType("video/*");
+                        break;
+
+                    case "all":
+                    default:
+                        intent.setType("*/*");
+                        intent.putExtra(Intent.EXTRA_MIME_TYPES,
+                            new String[]{"image/*", "video/*"});
+                        break;
                 }
 
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, selectionLimit > 1);
